@@ -38,6 +38,16 @@ import org.slf4j.spi.LoggerFactoryBinder;
 public class StaticLoggerBinder implements LoggerFactoryBinder {
 
     /**
+     * The ILoggerFactory instance returned by the {@link #getLoggerFactory} method should always be the same object
+     */
+    private final ILoggerFactory loggerFactory;
+
+    private static final String loggerFactoryClassStr = SimpleLoggerFactory.class.getName();
+
+    /** 声明此实现针对的SLF4J API版本, 每个主要版本都会修改此字段的值, 注意：为避免编译器不断折叠，此字段不可以声明为final */
+    public static String REQUESTED_API_VERSION = "1.6.99";
+
+    /**
      * The unique instance of this class.
      * 
      */
@@ -51,21 +61,6 @@ public class StaticLoggerBinder implements LoggerFactoryBinder {
     public static final StaticLoggerBinder getSingleton() {
         return SINGLETON;
     }
-
-    /**
-     * Declare the version of the SLF4J API this implementation is compiled against. 
-     * The value of this field is modified with each major release. 
-     */
-    // to avoid constant folding by the compiler, this field must *not* be final
-    public static String REQUESTED_API_VERSION = "1.6.99"; // !final
-
-    private static final String loggerFactoryClassStr = SimpleLoggerFactory.class.getName();
-
-    /**
-     * The ILoggerFactory instance returned by the {@link #getLoggerFactory}
-     * method should always be the same object
-     */
-    private final ILoggerFactory loggerFactory;
 
     private StaticLoggerBinder() {
         loggerFactory = new SimpleLoggerFactory();

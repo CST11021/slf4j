@@ -25,17 +25,27 @@
 package org.slf4j.helpers;
 
 /**
- * An internal utility class.
+ * 内部实用程序类：用于获取系统属性
  *
  * @author Alexander Dorokhine
  * @author Ceki G&uuml;lc&uuml;
  */
 public final class Util {
 
+    private static ClassContextSecurityManager SECURITY_MANAGER;
+    private static boolean SECURITY_MANAGER_CREATION_ALREADY_ATTEMPTED = false;
 	
     private Util() {
     }
 
+    // 获取系统属性
+
+    /**
+     * 获取系统属性配置
+     *
+     * @param key
+     * @return
+     */
     public static String safeGetSystemProperty(String key) {
         if (key == null)
             throw new IllegalArgumentException("null input");
@@ -49,6 +59,12 @@ public final class Util {
         return result;
     }
 
+    /**
+     * 获取系统属性配置
+     *
+     * @param key
+     * @return
+     */
     public static boolean safeGetBooleanSystemProperty(String key) {
         String value = safeGetSystemProperty(key);
         if (value == null)
@@ -67,9 +83,6 @@ public final class Util {
             return super.getClassContext();
         }
     }
-
-    private static ClassContextSecurityManager SECURITY_MANAGER;
-    private static boolean SECURITY_MANAGER_CREATION_ALREADY_ATTEMPTED = false;
 
     private static ClassContextSecurityManager getSecurityManager() {
         if (SECURITY_MANAGER != null)
@@ -92,9 +105,9 @@ public final class Util {
     }
 
     /**
-     * Returns the name of the class which called the invoking method.
+     * 返回调用的方法，所在的类的名称
      *
-     * @return the name of the class which called the invoking method.
+     * @return 调用的方法，所在的类的名称
      */
     public static Class<?> getCallingClass() {
         ClassContextSecurityManager securityManager = getSecurityManager();
@@ -118,12 +131,23 @@ public final class Util {
         return trace[i + 2];
     }
 
+    /**
+     * 向控制台输出警告
+     *
+     * @param msg
+     * @param t
+     */
     static final public void report(String msg, Throwable t) {
         System.err.println(msg);
         System.err.println("Reported exception:");
         t.printStackTrace();
     }
 
+    /**
+     * 向控制台输出警告
+     *
+     * @param msg
+     */
     static final public void report(String msg) {
         System.err.println("SLF4J: " + msg);
     }

@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2004-2012 QOS.ch
  * All rights reserved.
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to  deal in  the Software without  restriction, including
@@ -9,10 +9,10 @@
  * distribute,  sublicense, and/or sell  copies of  the Software,  and to
  * permit persons to whom the Software  is furnished to do so, subject to
  * the following conditions:
- *
+ * <p>
  * The  above  copyright  notice  and  this permission  notice  shall  be
  * included in all copies or substantial portions of the Software.
- *
+ * <p>
  * THE  SOFTWARE IS  PROVIDED  "AS  IS", WITHOUT  WARRANTY  OF ANY  KIND,
  * EXPRESS OR  IMPLIED, INCLUDING  BUT NOT LIMITED  TO THE  WARRANTIES OF
  * MERCHANTABILITY,    FITNESS    FOR    A   PARTICULAR    PURPOSE    AND
@@ -20,12 +20,8 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE,  ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 package org.slf4j.impl;
-
-import java.io.PrintStream;
-import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.event.LoggingEvent;
@@ -33,6 +29,9 @@ import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MarkerIgnoringBase;
 import org.slf4j.helpers.MessageFormatter;
 import org.slf4j.spi.LocationAwareLogger;
+
+import java.io.PrintStream;
+import java.util.Date;
 
 /**
  * <p>
@@ -45,7 +44,7 @@ import org.slf4j.spi.LocationAwareLogger;
  * <li><code>org.slf4j.simpleLogger.logFile</code> - The output target which can
  * be the <em>path</em> to a file, or the special values "System.out" and
  * "System.err". Default is "System.err".</li>
- * 
+ *
  * <li><code>org.slf4j.simpleLogger.cacheOutputStream</code> - If the output
  * target is set to "System.out" or "System.err" (see preceding entry), by
  * default, logs will be output to the latest value referenced by
@@ -54,7 +53,7 @@ import org.slf4j.spi.LocationAwareLogger;
  * initialization time and re-used independently of the current value referenced by
  *  <code>System.out/err</code>.
  * </li>
- * 
+ *
  * <li><code>org.slf4j.simpleLogger.defaultLogLevel</code> - Default log level
  * for all instances of SimpleLogger. Must be one of ("trace", "debug", "info",
  * "warn", "error" or "off"). If not specified, defaults to "info".</li>
@@ -95,7 +94,7 @@ import org.slf4j.spi.LocationAwareLogger;
  *
  * <li><code>org.slf4j.simpleLogger.warnLevelString</code> - The string value
  * output for the warn level. Defaults to <code>WARN</code>.</li>
- * 
+ *
  * </ul>
  *
  * <p>
@@ -114,7 +113,7 @@ import org.slf4j.spi.LocationAwareLogger;
  * <p>
  * Sample output follows.
  * </p>
- * 
+ *
  * <pre>
  * 176 [main] INFO examples.Sort - Populating an array of 2 elements in reverse order.
  * 225 [main] INFO examples.SortAlgo - Entered the sort method.
@@ -151,30 +150,31 @@ public class SimpleLogger extends MarkerIgnoringBase {
     protected static final int LOG_LEVEL_INFO = LocationAwareLogger.INFO_INT;
     protected static final int LOG_LEVEL_WARN = LocationAwareLogger.WARN_INT;
     protected static final int LOG_LEVEL_ERROR = LocationAwareLogger.ERROR_INT;
-    // The OFF level can only be used in configuration files to disable logging.
-    // It has
-    // no printing method associated with it in o.s.Logger interface.
+    /** OFF级别只能在配置文件中使用以禁用日志记录，在o.s.Logger界面中没有与之关联的打印方法 */
     protected static final int LOG_LEVEL_OFF = LOG_LEVEL_ERROR + 10;
 
     private static boolean INITIALIZED = false;
+    /** 日志配置 */
     static SimpleLoggerConfiguration CONFIG_PARAMS = null;
 
+
+
+    /** 外部软件可能会直接调用此方法, 不要重命名或更改其语义 */
+    static void init() {
+        // 初始化日志配置
+        CONFIG_PARAMS = new SimpleLoggerConfiguration();
+        CONFIG_PARAMS.init();
+    }
+
     static void lazyInit() {
-        if (INITIALIZED) {
+        if(INITIALIZED) {
             return;
         }
         INITIALIZED = true;
         init();
     }
 
-    // external software might be invoking this method directly. Do not rename
-    // or change its semantics.
-    static void init() {
-        CONFIG_PARAMS = new SimpleLoggerConfiguration();
-        CONFIG_PARAMS.init();
-    }
-
-    /** The current log level */
+    /** 表示当前日志级别 */
     protected int currentLogLevel = LOG_LEVEL_INFO;
     /** The short name of this simple log instance */
     private transient String shortLogName = null;
@@ -208,14 +208,13 @@ public class SimpleLogger extends MarkerIgnoringBase {
     public static final String DEFAULT_LOG_LEVEL_KEY = SimpleLogger.SYSTEM_PREFIX + "defaultLogLevel";
 
     /**
-     * Package access allows only {@link SimpleLoggerFactory} to instantiate
-     * SimpleLogger instances.
+     * Package access allows only {@link SimpleLoggerFactory} to instantiate SimpleLogger instances.
      */
     SimpleLogger(String name) {
         this.name = name;
 
         String levelString = recursivelyComputeLevelString();
-        if (levelString != null) {
+        if(levelString != null) {
             this.currentLogLevel = SimpleLoggerConfiguration.stringToLevel(levelString);
         } else {
             this.currentLogLevel = CONFIG_PARAMS.defaultLogLevel;
@@ -226,7 +225,7 @@ public class SimpleLogger extends MarkerIgnoringBase {
         String tempName = name;
         String levelString = null;
         int indexOfLastDot = tempName.length();
-        while ((levelString == null) && (indexOfLastDot > -1)) {
+        while((levelString == null) && (indexOfLastDot > -1)) {
             tempName = tempName.substring(0, indexOfLastDot);
             levelString = CONFIG_PARAMS.getStringProperty(SimpleLogger.LOG_KEY_PREFIX + tempName, null);
             indexOfLastDot = String.valueOf(tempName).lastIndexOf(".");
@@ -235,26 +234,22 @@ public class SimpleLogger extends MarkerIgnoringBase {
     }
 
     /**
-     * This is our internal implementation for logging regular
-     * (non-parameterized) log messages.
+     * 这是我们用于记录常规（非参数化）日志消息的内部实现。
      *
-     * @param level
-     *            One of the LOG_LEVEL_XXX constants defining the log level
-     * @param message
-     *            The message itself
-     * @param t
-     *            The exception whose stack trace should be logged
+     * @param level     日志级别：LOG_LEVEL_XXX 常量之一
+     * @param message   日志字符串
+     * @param t         应记录其堆栈跟踪的异常
      */
     private void log(int level, String message, Throwable t) {
-        if (!isLevelEnabled(level)) {
+        if(!isLevelEnabled(level)) {
             return;
         }
 
         StringBuilder buf = new StringBuilder(32);
 
-        // Append date-time if so configured
-        if (CONFIG_PARAMS.showDateTime) {
-            if (CONFIG_PARAMS.dateFormatter != null) {
+        // 如果配置，则附加日期时间
+        if(CONFIG_PARAMS.showDateTime) {
+            if(CONFIG_PARAMS.dateFormatter != null) {
                 buf.append(getFormattedDate());
                 buf.append(' ');
             } else {
@@ -263,33 +258,33 @@ public class SimpleLogger extends MarkerIgnoringBase {
             }
         }
 
-        // Append current thread name if so configured
-        if (CONFIG_PARAMS.showThreadName) {
+        // 如果这样配置，则追加当前线程名称
+        if(CONFIG_PARAMS.showThreadName) {
             buf.append('[');
             buf.append(Thread.currentThread().getName());
             buf.append("] ");
         }
 
-        if (CONFIG_PARAMS.levelInBrackets)
+        if(CONFIG_PARAMS.levelInBrackets)
             buf.append('[');
 
-        // Append a readable representation of the log level
+        // 追加日志级别的可读表示
         String levelStr = renderLevel(level);
         buf.append(levelStr);
-        if (CONFIG_PARAMS.levelInBrackets)
+        if(CONFIG_PARAMS.levelInBrackets)
             buf.append(']');
         buf.append(' ');
 
-        // Append the name of the log instance if so configured
-        if (CONFIG_PARAMS.showShortLogName) {
-            if (shortLogName == null)
+        // 如果这样配置，请追加日志实例的名称
+        if(CONFIG_PARAMS.showShortLogName) {
+            if(shortLogName == null)
                 shortLogName = computeShortName();
             buf.append(String.valueOf(shortLogName)).append(" - ");
-        } else if (CONFIG_PARAMS.showLogName) {
+        } else if(CONFIG_PARAMS.showLogName) {
             buf.append(String.valueOf(name)).append(" - ");
         }
 
-        // Append the message
+        // 追加日志信息
         buf.append(message);
 
         write(buf, t);
@@ -297,21 +292,27 @@ public class SimpleLogger extends MarkerIgnoringBase {
     }
 
     protected String renderLevel(int level) {
-        switch (level) {
-        case LOG_LEVEL_TRACE:
-            return "TRACE";
-        case LOG_LEVEL_DEBUG:
-            return ("DEBUG");
-        case LOG_LEVEL_INFO:
-            return "INFO";
-        case LOG_LEVEL_WARN:
-            return CONFIG_PARAMS.warnLevelString;
-        case LOG_LEVEL_ERROR:
-            return "ERROR";
+        switch(level) {
+            case LOG_LEVEL_TRACE:
+                return "TRACE";
+            case LOG_LEVEL_DEBUG:
+                return ("DEBUG");
+            case LOG_LEVEL_INFO:
+                return "INFO";
+            case LOG_LEVEL_WARN:
+                return CONFIG_PARAMS.warnLevelString;
+            case LOG_LEVEL_ERROR:
+                return "ERROR";
         }
         throw new IllegalStateException("Unrecognized level [" + level + "]");
     }
 
+    /**
+     * 输出日志信息
+     *
+     * @param buf
+     * @param t
+     */
     void write(StringBuilder buf, Throwable t) {
         PrintStream targetStream = CONFIG_PARAMS.outputChoice.getTargetPrintStream();
 
@@ -321,7 +322,7 @@ public class SimpleLogger extends MarkerIgnoringBase {
     }
 
     protected void writeThrowable(Throwable t, PrintStream targetStream) {
-        if (t != null) {
+        if(t != null) {
             t.printStackTrace(targetStream);
         }
     }
@@ -329,7 +330,7 @@ public class SimpleLogger extends MarkerIgnoringBase {
     private String getFormattedDate() {
         Date now = new Date();
         String dateText;
-        synchronized (CONFIG_PARAMS.dateFormatter) {
+        synchronized(CONFIG_PARAMS.dateFormatter) {
             dateText = CONFIG_PARAMS.dateFormatter.format(now);
         }
         return dateText;
@@ -348,7 +349,7 @@ public class SimpleLogger extends MarkerIgnoringBase {
      * @param arg2
      */
     private void formatAndLog(int level, String format, Object arg1, Object arg2) {
-        if (!isLevelEnabled(level)) {
+        if(!isLevelEnabled(level)) {
             return;
         }
         FormattingTuple tp = MessageFormatter.format(format, arg1, arg2);
@@ -364,7 +365,7 @@ public class SimpleLogger extends MarkerIgnoringBase {
      *            a list of 3 ore more arguments
      */
     private void formatAndLog(int level, String format, Object... arguments) {
-        if (!isLevelEnabled(level)) {
+        if(!isLevelEnabled(level)) {
             return;
         }
         FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
@@ -372,16 +373,17 @@ public class SimpleLogger extends MarkerIgnoringBase {
     }
 
     /**
-     * Is the given log level currently enabled?
+     * 当前是否启用了给定的日志级别？
      *
-     * @param logLevel
-     *            is this level enabled?
+     * @param logLevel is this level enabled?
      */
     protected boolean isLevelEnabled(int logLevel) {
-        // log level are numerically ordered so can use simple numeric
-        // comparison
+        // 对数级别按数字排序，因此可以使用简单的数字比较
         return (logLevel >= currentLogLevel);
     }
+
+
+
 
     /** Are {@code trace} messages currently enabled? */
     public boolean isTraceEnabled() {
@@ -596,7 +598,7 @@ public class SimpleLogger extends MarkerIgnoringBase {
     public void log(LoggingEvent event) {
         int levelInt = event.getLevel().toInt();
 
-        if (!isLevelEnabled(levelInt)) {
+        if(!isLevelEnabled(levelInt)) {
             return;
         }
         FormattingTuple tp = MessageFormatter.arrayFormat(event.getMessage(), event.getArgumentArray(), event.getThrowable());

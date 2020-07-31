@@ -27,39 +27,33 @@ package org.slf4j.impl;
 import org.slf4j.ILoggerFactory;
 
 /**
- * The binding of {@link org.slf4j.LoggerFactory} class with an actual instance of
- * {@link ILoggerFactory} is performed using information returned by this class.
+ * 使用此类返回的信息将{@link org.slf4j.LoggerFactory}类与{@link ILoggerFactory}的实际实例进行绑定。
  *
- * This class is meant to provide a dummy StaticLoggerBinder to the slf4j-api module.
- * Real implementations are found in  each SLF4J binding project, e.g. slf4j-nop,
- * slf4j-log4j12 etc.
+ * 此类的作用是为slf4j-api模块提供一个虚拟的StaticLoggerBinder，防止在源码调试的时候报错，但是实际编译成jar包时，org.slf4j.impl 包及
+ * 该包下面的类并不存在，相应的类都放到每个具体的实现包中，在每个SLF4J绑定项目中（即实现slf4j的日志实现框架）都对应的 org.slf4j.impl 包，
+ * 和包下面的类，例如slf4j-nop，slf4j-log4j12等
  *
  * @author Ceki G&uuml;lc&uuml;
  */
 public class StaticLoggerBinder {
 
-    /**
-     * The unique instance of this class.
-     */
+    /** 此类的唯一实例 */
     private static final StaticLoggerBinder SINGLETON = new StaticLoggerBinder();
 
     /**
-     * Return the singleton of this class.
+     * 返回此类的单例。
      *
-     * @return the StaticLoggerBinder singleton
+     * @return StaticLoggerBinder单例
      */
     public static final StaticLoggerBinder getSingleton() {
         return SINGLETON;
     }
 
-    /**
-     * Declare the version of the SLF4J API this implementation is compiled against.
-     * The value of this field is modified with each major release.
-     */
-    // to avoid constant folding by the compiler, this field must *not* be final
-    public static String REQUESTED_API_VERSION = "1.6.99"; // !final
+    /** 声明此实现针对的SLF4J API版本, 每个主要版本都会修改此字段的值, 注意：为避免编译器不断折叠，此字段不可以声明为final */
+    public static String REQUESTED_API_VERSION = "1.6.99";
 
     private StaticLoggerBinder() {
+        // This code should have never made it into slf4j-api.jar：这段代码永远都不会放入slf4j-api.jar
         throw new UnsupportedOperationException("This code should have never made it into slf4j-api.jar");
     }
 
@@ -70,4 +64,5 @@ public class StaticLoggerBinder {
     public String getLoggerFactoryClassStr() {
         throw new UnsupportedOperationException("This code should never make it into slf4j-api.jar");
     }
+
 }

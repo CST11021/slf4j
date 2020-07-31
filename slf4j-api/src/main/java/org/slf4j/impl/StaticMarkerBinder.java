@@ -42,9 +42,7 @@ import org.slf4j.spi.MarkerFactoryBinder;
  */
 public class StaticMarkerBinder implements MarkerFactoryBinder {
 
-    /**
-     * The unique instance of this class.
-     */
+    /** 此类的唯一实例 */
     public static final StaticMarkerBinder SINGLETON = new StaticMarkerBinder();
 
     private StaticMarkerBinder() {
@@ -52,7 +50,7 @@ public class StaticMarkerBinder implements MarkerFactoryBinder {
     }
 
     /**
-     * Return the singleton of this class.
+     * 返回此类的单例
      * 
      * @return the StaticMarkerBinder singleton
      * @since 1.7.14
@@ -62,18 +60,22 @@ public class StaticMarkerBinder implements MarkerFactoryBinder {
     }
 
     /**
-     * Currently this method always returns an instance of 
+     * 目前，此方法始终返回的实例
+     *
      * {@link BasicMarkerFactory}.
      */
     public IMarkerFactory getMarkerFactory() {
+        // This code should have never made it into slf4j-api.jar：这段代码永远都不会放入slf4j-api.jar
         throw new UnsupportedOperationException("This code should never make it into the jar");
     }
 
     /**
-     * Currently, this method returns the class name of
+     * 当前，此方法返回的类名称
+     *
      * {@link BasicMarkerFactory}.
      */
     public String getMarkerFactoryClassStr() {
+        // This code should have never made it into slf4j-api.jar：这段代码永远都不会放入slf4j-api.jar
         throw new UnsupportedOperationException("This code should never make it into the jar");
     }
 

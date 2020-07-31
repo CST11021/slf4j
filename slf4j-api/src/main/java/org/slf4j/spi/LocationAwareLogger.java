@@ -39,8 +39,8 @@ import org.slf4j.Marker;
  */
 public interface LocationAwareLogger extends Logger {
 
-    // these constants should be in EventContants. However, in order to preserve binary backward compatibility
-    // we keep these constants here
+    // 这些常量应该在EventContant中。但是，为了保持二进制向后兼容性，我们在此处保留这些常量
+
     final public int TRACE_INT = 00;
     final public int DEBUG_INT = 10;
     final public int INFO_INT = 20;
@@ -48,14 +48,13 @@ public interface LocationAwareLogger extends Logger {
     final public int ERROR_INT = 40;
 
     /**
-     * Printing method with support for location information. 
+     * 支持位置信息的打印方法
      * 
-     * @param marker The marker to be used for this event, may be null.
-     * @param fqcn The fully qualified class name of the <b>logger instance</b>,
-     * typically the logger class, logger bridge or a logger wrapper.
-     * @param level One of the level integers defined in this interface
-     * @param message The message for the log event
-     * @param t Throwable associated with the log event, may be null.
+     * @param marker    用于此事件的标记可以为null
+     * @param fqcn      记录器实例的完全限定的类名称，通常是记录器类，记录器桥或记录器包装器.
+     * @param level     此接口中定义的级别整数之一
+     * @param message   日志事件的消息
+     * @param t         与日志事件关联的Throwable，可以为null
      */
     public void log(Marker marker, String fqcn, int level, String message, Object[] argArray, Throwable t);
 

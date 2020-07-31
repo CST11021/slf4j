@@ -39,6 +39,11 @@ import org.slf4j.Marker;
 public class BasicMarker implements Marker {
 
     private static final long serialVersionUID = -2849567615646933777L;
+
+    private static String OPEN = "[ ";
+    private static String CLOSE = " ]";
+    private static String SEP = ", ";
+
     private final String name;
     private List<Marker> referenceList = new CopyOnWriteArrayList<Marker>();
 
@@ -58,12 +63,11 @@ public class BasicMarker implements Marker {
             throw new IllegalArgumentException("A null value cannot be added to a Marker as reference.");
         }
 
-        // no point in adding the reference multiple times
+        // 多次添加参考没有意义
         if (this.contains(reference)) {
             return;
-
-        } else if (reference.contains(this)) { // avoid recursion
-            // a potential reference should not hold its future "parent" as a reference
+        } else if (reference.contains(this)) {
+            // avoid recursion a potential reference should not hold its future "parent" as a reference
             return;
         } else {
             referenceList.add(reference);
@@ -127,9 +131,7 @@ public class BasicMarker implements Marker {
         return false;
     }
 
-    private static String OPEN = "[ ";
-    private static String CLOSE = " ]";
-    private static String SEP = ", ";
+
 
     public boolean equals(Object obj) {
         if (this == obj)

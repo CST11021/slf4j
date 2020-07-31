@@ -46,7 +46,10 @@ public class SimpleLoggerFactory implements ILoggerFactory {
     }
 
     /**
-     * Return an appropriate {@link SimpleLogger} instance by name.
+     * 按名称返回适当的{@link SimpleLogger}实例
+     *
+     * @param name the name of the Logger to return
+     * @return
      */
     public Logger getLogger(String name) {
         Logger simpleLogger = loggerMap.get(name);

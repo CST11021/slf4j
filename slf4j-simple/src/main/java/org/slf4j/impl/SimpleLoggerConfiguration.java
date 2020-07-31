@@ -95,6 +95,9 @@ public class SimpleLoggerConfiguration {
         }
     }
 
+    /**
+     * 加载property配置文件
+     */
     private void loadProperties() {
         // Add props from the resource simplelogger.properties
         InputStream in = AccessController.doPrivileged(new PrivilegedAction<InputStream>() {

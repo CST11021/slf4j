@@ -26,18 +26,15 @@
 package org.slf4j;
 
 /**
- * The org.slf4j.Logger interface is the main user entry point of SLF4J API.
- * It is expected that logging takes place through concrete implementations
- * of this interface.
- * <p/>
- * <h3>Typical usage pattern:</h3>
- * <pre>
+ * org.slf4j.Logger接口是SLF4J API的主要用户入口点, 通过该接口的具体实现进行日志记录.
+
+ * 典型用法：
  * import org.slf4j.Logger;
  * import org.slf4j.LoggerFactory;
  *
  * public class Wombat {
  *
- *   <span style="color:green">final static Logger logger = LoggerFactory.getLogger(Wombat.class);</span>
+ *   final static Logger logger = LoggerFactory.getLogger(Wombat.class);
  *   Integer t;
  *   Integer oldT;
  *
@@ -50,10 +47,9 @@ package org.slf4j;
  *     }
  *   }
  * }
- * </pre>
  *
- * Be sure to read the FAQ entry relating to <a href="../../../faq.html#logging_performance">parameterized
- * logging</a>. Note that logging statements can be parameterized in
+ * Be sure to read the FAQ entry relating to <a href="../../../faq.html#logging_performance">parameterized logging</a>.
+ * Note that logging statements can be parameterized in
  * <a href="../../../faq.html#paramException">presence of an exception/throwable</a>.
  *
  * <p>Once you are comfortable using loggers, i.e. instances of this interface, consider using
@@ -64,29 +60,35 @@ package org.slf4j;
 public interface Logger {
 
     /**
-     * Case insensitive String constant used to retrieve the name of the root logger.
+     * 不区分大小写的字符串常量，用于检索根记录器的名称
      *
      * @since 1.3
      */
     final public String ROOT_LOGGER_NAME = "ROOT";
 
     /**
-     * Return the name of this <code>Logger</code> instance.
-     * @return name of this logger instance 
+     * 该记录器实例的名称
+     *
+     * @return 该记录器实例的名称
      */
     public String getName();
 
+
+
+
+    // trace级别
+
+
     /**
-     * Is the logger instance enabled for the TRACE level?
+     * 记录器实例是否已启用TRACE级别？
      *
-     * @return True if this Logger is enabled for the TRACE level,
-     *         false otherwise.
+     * @return True if this Logger is enabled for the TRACE level, false otherwise.
      * @since 1.4
      */
     public boolean isTraceEnabled();
 
     /**
-     * Log a message at the TRACE level.
+     * 在TRACE级别记录一条消息。
      *
      * @param msg the message string to be logged
      * @since 1.4
@@ -94,11 +96,7 @@ public interface Logger {
     public void trace(String msg);
 
     /**
-     * Log a message at the TRACE level according to the specified format
-     * and argument.
-     * <p/>
-     * <p>This form avoids superfluous object creation when the logger
-     * is disabled for the TRACE level. </p>
+     * 根据指定的格式和参数在TRACE级别记录一条消息。当为TRACE级别禁用记录器时，这种形式避免了多余的对象创建。
      *
      * @param format the format string
      * @param arg    the argument
@@ -107,11 +105,7 @@ public interface Logger {
     public void trace(String format, Object arg);
 
     /**
-     * Log a message at the TRACE level according to the specified format
-     * and arguments.
-     * <p/>
-     * <p>This form avoids superfluous object creation when the logger
-     * is disabled for the TRACE level. </p>
+     * 根据指定的格式和参数在TRACE级别记录一条消息。当为TRACE级别禁用记录器时，这种形式避免了多余的对象创建。
      *
      * @param format the format string
      * @param arg1   the first argument
@@ -121,14 +115,8 @@ public interface Logger {
     public void trace(String format, Object arg1, Object arg2);
 
     /**
-     * Log a message at the TRACE level according to the specified format
-     * and arguments.
-     * <p/>
-     * <p>This form avoids superfluous string concatenation when the logger
-     * is disabled for the TRACE level. However, this variant incurs the hidden
-     * (and relatively small) cost of creating an <code>Object[]</code> before invoking the method,
-     * even if this logger is disabled for TRACE. The variants taking {@link #trace(String, Object) one} and
-     * {@link #trace(String, Object, Object) two} arguments exist solely in order to avoid this hidden cost.</p>
+     * 根据指定的格式和参数在TRACE级别记录一条消息。当为TRACE级别禁用记录器时，这种形式可以避免多余的字符串连接。
+     * 但是，在调用该方法之前，此变体招致了创建Object[] 的隐藏（且相对较小）的开销，即使此记录器的TRACE功能已被禁用。仅使用{@link #trace(String, Object)}和{@link #trace(String, Object, Object)}作为参数的变体是为了避免这种隐藏成本。
      *
      * @param format    the format string
      * @param arguments a list of 3 or more arguments
@@ -137,11 +125,10 @@ public interface Logger {
     public void trace(String format, Object... arguments);
 
     /**
-     * Log an exception (throwable) at the TRACE level with an
-     * accompanying message.
+     * 在TRACE级别上记录伴随消息的异常（可抛出）。
      *
-     * @param msg the message accompanying the exception
-     * @param t   the exception (throwable) to log
+     * @param msg   伴随异常的消息
+     * @param t     记录的异常（可抛出）
      * @since 1.4
      */
     public void trace(String msg, Throwable t);
@@ -159,7 +146,17 @@ public interface Logger {
     public boolean isTraceEnabled(Marker marker);
 
     /**
-     * Log a message with the specific Marker at the TRACE level.
+     * 在TRACE级别记录带有特定标记的消息，例如：
+     *
+     * public static void main(String args[]) {
+     *   Logger logger = LoggerFactory.getLogger(LogTest.class);
+     *   Marker marker = new BasicMarker("mjd507-marker:");
+     *   logger.info(marker, "Hello World");
+     * }
+     *
+     * // 增加了 Marker 之后，日志内容前面会添加上标记的内容
+     * [main] INFO LogTest - mjd507-marker:Hello World
+     *
      *
      * @param marker the marker data specific to this log statement
      * @param msg    the message string to be logged
@@ -213,6 +210,12 @@ public interface Logger {
      * @since 1.4
      */
     public void trace(Marker marker, String msg, Throwable t);
+
+
+
+
+    // debug级别
+
 
     /**
      * Is the logger instance enabled for the DEBUG level?
@@ -340,6 +343,12 @@ public interface Logger {
      */
     public void debug(Marker marker, String msg, Throwable t);
 
+
+
+
+    // info级别
+
+
     /**
      * Is the logger instance enabled for the INFO level?
      *
@@ -464,6 +473,13 @@ public interface Logger {
      * @param t      the exception (throwable) to log
      */
     public void info(Marker marker, String msg, Throwable t);
+
+
+
+
+
+    // warn级别
+
 
     /**
      * Is the logger instance enabled for the WARN level?
@@ -590,6 +606,12 @@ public interface Logger {
      * @param t      the exception (throwable) to log
      */
     public void warn(Marker marker, String msg, Throwable t);
+
+
+
+
+    // error级别
+
 
     /**
      * Is the logger instance enabled for the ERROR level?

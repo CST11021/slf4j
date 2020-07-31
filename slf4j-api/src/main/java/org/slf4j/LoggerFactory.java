@@ -42,18 +42,7 @@ import org.slf4j.helpers.Util;
 import org.slf4j.impl.StaticLoggerBinder;
 
 /**
- * The <code>LoggerFactory</code> is a utility class producing Loggers for
- * various logging APIs, most notably for log4j, logback and JDK 1.4 logging.
- * Other implementations such as {@link org.slf4j.impl.NOPLogger NOPLogger} and
- * {@link org.slf4j.impl.SimpleLogger SimpleLogger} are also supported.
- * <p/>
- * <p/>
- * <code>LoggerFactory</code> is essentially a wrapper around an
- * {@link ILoggerFactory} instance bound with <code>LoggerFactory</code> at
- * compile time.
- * <p/>
- * <p/>
- * Please note that all methods in <code>LoggerFactory</code> are static.
+ * LoggerFactory为各种日志实现生成Logger，LoggerFactory本质上是在编译时对绑定的{@link ILoggerFactory}实例的包装，注意，LoggerFactory中的所有方法都是静态的
  * 
  * 
  * @author Alexander Dorokhine
@@ -86,10 +75,11 @@ public final class LoggerFactory {
     static final SubstituteLoggerFactory SUBST_FACTORY = new SubstituteLoggerFactory();
     static final NOPLoggerFactory NOP_FALLBACK_FACTORY = new NOPLoggerFactory();
 
-    // Support for detecting mismatched logger names.
+    /** 用于配置是否检测不匹配的Log的名称的属性名 */
     static final String DETECT_LOGGER_NAME_MISMATCH_PROPERTY = "slf4j.detectLoggerNameMismatch";
     static final String JAVA_VENDOR_PROPERTY = "java.vendor.url";
 
+    /** 是否检测不匹配的Log的名称 */
     static boolean DETECT_LOGGER_NAME_MISMATCH = Util.safeGetBooleanSystemProperty(DETECT_LOGGER_NAME_MISMATCH_PROPERTY);
 
     /**
@@ -101,9 +91,64 @@ public final class LoggerFactory {
      */
     static private final String[] API_COMPATIBILITY_LIST = new String[] { "1.6", "1.7" };
 
-    // private constructor prevents instantiation
+
     private LoggerFactory() {
     }
+
+
+
+
+    /**
+     * Return a logger named corresponding to the class passed as parameter,
+     * using the statically bound {@link ILoggerFactory} instance.
+     *
+     * <p>
+     * In case the the <code>clazz</code> parameter differs from the name of the
+     * caller as computed internally by SLF4J, a logger name mismatch warning
+     * will be printed but only if the
+     * <code>slf4j.detectLoggerNameMismatch</code> system property is set to
+     * true. By default, this property is not set and no warnings will be
+     * printed even in case of a logger name mismatch.
+     *
+     * @param clazz
+     *            the returned logger will be named after clazz
+     * @return logger
+     *
+     *
+     * @see <a
+     *      href="http://www.slf4j.org/codes.html#loggerNameMismatch">Detected
+     *      logger name mismatch</a>
+     */
+    public static Logger getLogger(Class<?> clazz) {
+
+        Logger logger = getLogger(clazz.getName());
+
+        if (DETECT_LOGGER_NAME_MISMATCH) {
+            Class<?> autoComputedCallingClass = Util.getCallingClass();
+
+            if (autoComputedCallingClass != null && nonMatchingClasses(clazz, autoComputedCallingClass)) {
+                // 向控制台输出警告
+                Util.report(String.format("Detected logger name mismatch. Given name: \"%s\"; computed name: \"%s\".",
+                                          logger.getName(), autoComputedCallingClass.getName()));
+                Util.report("See " + LOGGER_NAME_MISMATCH_URL + " for an explanation");
+            }
+        }
+        return logger;
+    }
+
+    /**
+     * 使用静态绑定的{@link ILoggerFactory}实例返回根据name参数命名的Log
+     *
+     * @param name  The name of the logger.
+     *
+     * @return logger
+     */
+    public static Logger getLogger(String name) {
+        // 获取与LoggerFactory绑定的ILoggerFactory实例
+        ILoggerFactory iLoggerFactory = getILoggerFactory();
+        return iLoggerFactory.getLogger(name);
+    }
+
 
     /**
      * Force LoggerFactory to consider itself uninitialized.
@@ -139,17 +184,24 @@ public final class LoggerFactory {
 
     private final static void bind() {
         try {
+
             Set<URL> staticLoggerBinderPathSet = null;
-            // skip check under android, see also
-            // http://jira.qos.ch/browse/SLF4J-328
+            // 在android下跳过检查，另请参阅http://jira.qos.ch/browse/SLF4J-328
             if (!isAndroid()) {
+                // 通过类加载器获取 org/slf4j/impl/StaticLoggerBinder.class 资源文件路径，每个slf4j日志实现，都会有一个{@link StaticLoggerBinder}类，正常这里只会返回一个url，但是有时候由于引入多个日志实现包，则会加载多个
                 staticLoggerBinderPathSet = findPossibleStaticLoggerBinderPathSet();
+                // 如果在类路径上找到多个绑定，则在控制台上打印警告消息，否则不进行报告
                 reportMultipleBindingAmbiguity(staticLoggerBinderPathSet);
             }
-            // the next line does the binding
+
+            // 下一行进行绑定
             StaticLoggerBinder.getSingleton();
+
             INITIALIZATION_STATE = SUCCESSFUL_INITIALIZATION;
+
+            // 如果引入了多个日志实现，则控制台输出当前使用的日志框架
             reportActualBinding(staticLoggerBinderPathSet);
+
         } catch (NoClassDefFoundError ncde) {
             String msg = ncde.getMessage();
             if (messageContainsOrgSlf4jImplStaticLoggerBinder(msg)) {
@@ -274,8 +326,7 @@ public final class LoggerFactory {
                 }
             }
             if (!match) {
-                Util.report("The requested version " + requested + " by your slf4j binding is not compatible with "
-                                + Arrays.asList(API_COMPATIBILITY_LIST).toString());
+                Util.report("The requested version " + requested + " by your slf4j binding is not compatible with " + Arrays.asList(API_COMPATIBILITY_LIST).toString());
                 Util.report("See " + VERSION_MISMATCH + " for further details.");
             }
         } catch (java.lang.NoSuchFieldError nsfe) {
@@ -289,24 +340,30 @@ public final class LoggerFactory {
         }
     }
 
-    // We need to use the name of the StaticLoggerBinder class, but we can't
-    // reference
-    // the class itself.
+    /** 我们需要使用StaticLoggerBinder类的名称，但不能引用该类本身 */
     private static String STATIC_LOGGER_BINDER_PATH = "org/slf4j/impl/StaticLoggerBinder.class";
 
+    /**
+     * 通过类加载器获取 org/slf4j/impl/StaticLoggerBinder.class 资源文件路径，每个slf4j日志实现，都会有一个{@link StaticLoggerBinder}类
+     * 例如：
+     * file:/Users/wanghongzhan/IdeaProjects/slf4j/slf4j-simple/target/classes/org/slf4j/impl/StaticLoggerBinder.class
+     * file:/Users/wanghongzhan/IdeaProjects/slf4j/slf4j-api/target/classes/org/slf4j/impl/StaticLoggerBinder.class
+     *
+     * @return
+     */
     static Set<URL> findPossibleStaticLoggerBinderPathSet() {
-        // use Set instead of list in order to deal with bug #138
-        // LinkedHashSet appropriate here because it preserves insertion order
-        // during iteration
+        // 使用Set而不是list来处理错误，这里适合使用LinkedHashSet，因为它在迭代过程中保留插入顺序
         Set<URL> staticLoggerBinderPathSet = new LinkedHashSet<URL>();
         try {
             ClassLoader loggerFactoryClassLoader = LoggerFactory.class.getClassLoader();
             Enumeration<URL> paths;
             if (loggerFactoryClassLoader == null) {
+                // org/slf4j/impl/StaticLoggerBinder.class
                 paths = ClassLoader.getSystemResources(STATIC_LOGGER_BINDER_PATH);
             } else {
                 paths = loggerFactoryClassLoader.getResources(STATIC_LOGGER_BINDER_PATH);
             }
+
             while (paths.hasMoreElements()) {
                 URL path = paths.nextElement();
                 staticLoggerBinderPathSet.add(path);
@@ -317,14 +374,20 @@ public final class LoggerFactory {
         return staticLoggerBinderPathSet;
     }
 
+    /**
+     * 是否存在多个Log实现
+     *
+     * @param binderPathSet
+     * @return
+     */
     private static boolean isAmbiguousStaticLoggerBinderPathSet(Set<URL> binderPathSet) {
         return binderPathSet.size() > 1;
     }
 
     /**
-     * Prints a warning message on the console if multiple bindings were found
-     * on the class path. No reporting is done otherwise.
-     * 
+     * 如果在类路径上找到多个绑定，则在控制台上打印警告消息，否则不进行报告
+     *
+     * @param binderPathSet
      */
     private static void reportMultipleBindingAmbiguity(Set<URL> binderPathSet) {
         if (isAmbiguousStaticLoggerBinderPathSet(binderPathSet)) {
@@ -343,69 +406,31 @@ public final class LoggerFactory {
         return vendor.toLowerCase().contains("android");
     }
 
+    /**
+     * 如果引入了多个日志实现，则控制台输出当前使用的日志框架
+     *
+     * @param binderPathSet
+     */
     private static void reportActualBinding(Set<URL> binderPathSet) {
-        // binderPathSet can be null under Android
+        // 在Android下，bindPathSet可以为null
         if (binderPathSet != null && isAmbiguousStaticLoggerBinderPathSet(binderPathSet)) {
             Util.report("Actual binding is of type [" + StaticLoggerBinder.getSingleton().getLoggerFactoryClassStr() + "]");
         }
     }
 
     /**
-     * Return a logger named according to the name parameter using the
-     * statically bound {@link ILoggerFactory} instance.
-     * 
-     * @param name
-     *            The name of the logger.
-     * @return logger
-     */
-    public static Logger getLogger(String name) {
-        ILoggerFactory iLoggerFactory = getILoggerFactory();
-        return iLoggerFactory.getLogger(name);
-    }
-
-    /**
-     * Return a logger named corresponding to the class passed as parameter,
-     * using the statically bound {@link ILoggerFactory} instance.
-     * 
-     * <p>
-     * In case the the <code>clazz</code> parameter differs from the name of the
-     * caller as computed internally by SLF4J, a logger name mismatch warning
-     * will be printed but only if the
-     * <code>slf4j.detectLoggerNameMismatch</code> system property is set to
-     * true. By default, this property is not set and no warnings will be
-     * printed even in case of a logger name mismatch.
-     * 
+     * 如果clazz不是为autoComputedCallingClass的实例，则返回true
+     *
      * @param clazz
-     *            the returned logger will be named after clazz
-     * @return logger
-     * 
-     * 
-     * @see <a
-     *      href="http://www.slf4j.org/codes.html#loggerNameMismatch">Detected
-     *      logger name mismatch</a>
+     * @param autoComputedCallingClass
+     * @return
      */
-    public static Logger getLogger(Class<?> clazz) {
-        Logger logger = getLogger(clazz.getName());
-        if (DETECT_LOGGER_NAME_MISMATCH) {
-            Class<?> autoComputedCallingClass = Util.getCallingClass();
-            if (autoComputedCallingClass != null && nonMatchingClasses(clazz, autoComputedCallingClass)) {
-                Util.report(String.format("Detected logger name mismatch. Given name: \"%s\"; computed name: \"%s\".", logger.getName(),
-                                autoComputedCallingClass.getName()));
-                Util.report("See " + LOGGER_NAME_MISMATCH_URL + " for an explanation");
-            }
-        }
-        return logger;
-    }
-
     private static boolean nonMatchingClasses(Class<?> clazz, Class<?> autoComputedCallingClass) {
         return !autoComputedCallingClass.isAssignableFrom(clazz);
     }
 
     /**
-     * Return the {@link ILoggerFactory} instance in use.
-     * <p/>
-     * <p/>
-     * ILoggerFactory instance is bound with this class at compile time.
+     *返回正在使用的{@link ILoggerFactory}实例, ILoggerFactory实例在编译时与此类绑定。
      * 
      * @return the ILoggerFactory instance in use
      */
@@ -414,22 +439,33 @@ public final class LoggerFactory {
             synchronized (LoggerFactory.class) {
                 if (INITIALIZATION_STATE == UNINITIALIZED) {
                     INITIALIZATION_STATE = ONGOING_INITIALIZATION;
+
+                    // 执行初始化：初始化一个StaticLoggerBinder，StaticLoggerBinder在具体的日志实现的包中
                     performInitialization();
                 }
             }
         }
+
+
         switch (INITIALIZATION_STATE) {
-        case SUCCESSFUL_INITIALIZATION:
-            return StaticLoggerBinder.getSingleton().getLoggerFactory();
-        case NOP_FALLBACK_INITIALIZATION:
-            return NOP_FALLBACK_FACTORY;
-        case FAILED_INITIALIZATION:
-            throw new IllegalStateException(UNSUCCESSFUL_INIT_MSG);
-        case ONGOING_INITIALIZATION:
-            // support re-entrant behavior.
-            // See also http://jira.qos.ch/browse/SLF4J-97
-            return SUBST_FACTORY;
+
+            case SUCCESSFUL_INITIALIZATION:
+                // 成功初始化
+                return StaticLoggerBinder.getSingleton().getLoggerFactory();
+
+            case NOP_FALLBACK_INITIALIZATION:
+                // NOP后初始化
+                return NOP_FALLBACK_FACTORY;
+
+            case FAILED_INITIALIZATION:
+                // 初始化失败
+                throw new IllegalStateException(UNSUCCESSFUL_INIT_MSG);
+            case ONGOING_INITIALIZATION:
+                // 支持重入行为
+                return SUBST_FACTORY;
+
         }
+
         throw new IllegalStateException("Unreachable code");
     }
 }

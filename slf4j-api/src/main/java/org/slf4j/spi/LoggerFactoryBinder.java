@@ -35,21 +35,16 @@ import org.slf4j.ILoggerFactory;
 public interface LoggerFactoryBinder {
 
     /**
-     * Return the instance of {@link ILoggerFactory} that 
-     * {@link org.slf4j.LoggerFactory} class should bind to.
+     * 返回{@link org.slf4j.LoggerFactory}类应绑定的{@link ILoggerFactory}实例。
      * 
-     * @return the instance of {@link ILoggerFactory} that 
-     * {@link org.slf4j.LoggerFactory} class should bind to.
+     * @return
      */
     public ILoggerFactory getLoggerFactory();
 
     /**
-     * The String form of the {@link ILoggerFactory} object that this 
-     * <code>LoggerFactoryBinder</code> instance is <em>intended</em> to return. 
+     * 此LoggerFactoryBinder实例要返回的{@link ILoggerFactory}对象的String形式。
      * 
-     * <p>This method allows the developer to interrogate this binder's intention
-     * which may be different from the {@link ILoggerFactory} instance it is able to 
-     * yield in practice. The discrepancy should only occur in case of errors.
+     * 此方法允许开发人员询问此绑定器的意图，该意图可能与它在实践中能够产生的{@link ILoggerFactory}实例不同，差异仅在出现错误的情况下发生。
      * 
      * @return the class name of the intended {@link ILoggerFactory} instance
      */

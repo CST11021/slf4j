@@ -25,13 +25,10 @@
 package org.slf4j;
 
 /**
- * <code>ILoggerFactory</code> instances manufacture {@link Logger}
- * instances by name.
+ * ILoggerFactory通过类名称，创建{@link Logger}实例.
  * 
- * <p>Most users retrieve {@link Logger} instances through the static
- * {@link LoggerFactory#getLogger(String)} method. An instance of of this
- * interface is bound internally with {@link LoggerFactory} class at 
- * compile time. 
+ * 大多数用户通过静态{@link LoggerFactory#getLogger(String)}方法检索{@link Logger}实例。
+ * 在编译时，此接口的实例在内部与{@link LoggerFactory}类绑定。
  * 
  * @author Ceki G&uuml;lc&uuml;
  */

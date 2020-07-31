@@ -519,15 +519,15 @@ org.slf4j.impl.StaticLoggerBinder.SINGLETON from class org.slf4j.LoggerFactory
       where it needs to devise a logging strategy.
       </p>
 
-      <p>Let Wombat be a software library with very few
-      dependencies. If SLF4J is chosen as Wombat's logging API, then a
+      <p>Let com.whz.log.Wombat be a software library with very few
+      dependencies. If SLF4J is chosen as com.whz.log.Wombat's logging API, then a
       new dependency on <em>slf4j-api.jar</em> will be added to
-      Wombat's list of dependencies. Given that writing a logging
+      com.whz.log.Wombat's list of dependencies. Given that writing a logging
       wrapper does not seem that hard, some developers will be tempted
       to wrap SLF4J and link with it only if it is already present on
-      the classpath, making SLF4J an optional dependency of Wombat. In
+      the classpath, making SLF4J an optional dependency of com.whz.log.Wombat. In
       addition to solving the dependency problem, the wrapper will
-      isolate Wombat from SLF4J's API ensuring that logging in Wombat
+      isolate com.whz.log.Wombat from SLF4J's API ensuring that logging in com.whz.log.Wombat
       is future-proof. 
       </p>
 
@@ -554,12 +554,12 @@ org.slf4j.impl.StaticLoggerBinder.SINGLETON from class org.slf4j.LoggerFactory
       fine with any SLF4J version from version 1.0 and onwards.
       </p>
 
-      <p>It is reasonable to assume that in most projects Wombat will
+      <p>It is reasonable to assume that in most projects com.whz.log.Wombat will
       be one dependency among many.  If each library had its own
       logging wrapper, then each wrapper would presumably need to be
       configured separately. Thus, instead of having to deal with one
-      logging framework, namely SLF4J, the user of Wombat would have
-      to detail with Wombat's logging wrapper as well.  The problem
+      logging framework, namely SLF4J, the user of com.whz.log.Wombat would have
+      to detail with com.whz.log.Wombat's logging wrapper as well.  The problem
       will be compounded by each framework that comes up with its own
       wrapper in order to make SLF4J optional.  (Configuring or
       dealing with the intricacies of five different logging wrappers
@@ -584,7 +584,7 @@ org.slf4j.impl.StaticLoggerBinder.SINGLETON from class org.slf4j.LoggerFactory
       SLF4J support MDC and markers in addition to parameterized
       logging.  While one can come up with a seemingly working
       SLF4J-wrapper within hours, many technical issues will emerge
-      over time which Wombat developers will have to deal with. Note
+      over time which com.whz.log.Wombat developers will have to deal with. Note
       that SLF4J has evolved over several years and has 260 bug
       reports filed against it.</p>
 

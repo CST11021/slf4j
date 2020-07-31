@@ -127,9 +127,9 @@ SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further detail
       <pre class="prettyprint source"> 1: <b>import org.slf4j.Logger;</b>
  2: <b>import org.slf4j.LoggerFactory;</b>
  3: 
- 4: public class Wombat {
+ 4: public class com.whz.log.Wombat {
  5:  
- 6:   <b>final Logger logger = LoggerFactory.getLogger(Wombat.class);</b>
+ 6:   <b>final Logger logger = LoggerFactory.getLogger(com.whz.log.Wombat.class);</b>
  7:   Integer t;
  8:   Integer oldT;
  9:
@@ -267,12 +267,12 @@ SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further detail
       <code>org.slf4j.impl.StaticLoggerBinder</code> class is missing,
       SLF4J version 1.6.0 and later will emit a single warning message
       about the absence of a binding and proceed to discard all log
-      requests without further protest. For example, let Wombat be
+      requests without further protest. For example, let com.whz.log.Wombat be
       some biology-related framework depending on SLF4J for
       logging. In order to avoid imposing a logging framework on the
-      end-user, Wombat's distribution includes <em>slf4j-api.jar</em>
+      end-user, com.whz.log.Wombat's distribution includes <em>slf4j-api.jar</em>
       but no binding. Even in the absence of any SLF4J binding on the
-      class path, Wombat's distribution will still work
+      class path, com.whz.log.Wombat's distribution will still work
       out-of-the-box, and without requiring the end-user to download a
       binding from SLF4J's web-site. Only when the end-user decides to
       enable logging will she need to install the SLF4J binding

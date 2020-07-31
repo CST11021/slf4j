@@ -9,8 +9,7 @@ import org.slf4j.helpers.SubstituteLogger;
 
 /**
  *
- * This class is used to record events during the initialization phase of the
- * underlying logging framework. It is called by {@link SubstituteLogger}.
+ * 此类用于在基础日志记录框架的初始化阶段记录事件。由{@link SubstituteLogger}调用。
  *
  *
  * @author Ceki G&uumllc&uuml;
@@ -23,7 +22,7 @@ public class EventRecodingLogger implements Logger {
     SubstituteLogger logger;
     Queue<SubstituteLoggingEvent> eventQueue;
 
-    // as an event recording logger we have no choice but to record all events
+    /** 作为事件记录记录器，我们别无选择，只能记录所有事件 */
     final static boolean RECORD_ALL_EVENTS = true;
 
     public EventRecodingLogger(SubstituteLogger logger, Queue<SubstituteLoggingEvent> eventQueue) {

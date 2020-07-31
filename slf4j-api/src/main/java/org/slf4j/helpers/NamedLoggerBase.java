@@ -31,8 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Serves as base class for named logger implementation. More significantly, this
- * class establishes deserialization behavior.
+ * 用作命名记录器实现的基类。更重要的是，此类建立反序列化行为。
  * 
  * @author Ceki Gulcu
  * @see #readResolve
@@ -42,6 +41,14 @@ abstract class NamedLoggerBase implements Logger, Serializable {
 
     private static final long serialVersionUID = 7535258609338176893L;
 
+    /** 对应的打印日志所在的类，例如：
+     * public class Wombat {
+     *
+     *   final static Logger logger = LoggerFactory.getLogger(Wombat.class);
+     *   省略...
+     * }
+     * 这里的name = com.test.Wombat
+     */
     protected String name;
 
     public String getName() {
@@ -49,22 +56,15 @@ abstract class NamedLoggerBase implements Logger, Serializable {
     }
 
     /**
-     * Replace this instance with a homonymous (same name) logger returned 
-     * by LoggerFactory. Note that this method is only called during 
-     * deserialization.
-     * 
-     * <p>
-     * This approach will work well if the desired ILoggerFactory is the one
-     * references by LoggerFactory. However, if the user manages its logger hierarchy
-     * through a different (non-static) mechanism, e.g. dependency injection, then
-     * this approach would be mostly counterproductive.
+     * 用LoggerFactory返回的同名（同名）记录器替换此实例。请注意，仅在反序列化期间调用此方法。
+     *
+     * 如果所需的ILoggerFactory是LoggerFactory引用的一个，则此方法将很好地工作，但是，如果用户通过其他（非静态）机制来管理其记录器层次结构，例如依赖注入，那么这种方法将适得其反。
      * 
      * @return logger with same name as returned by LoggerFactory
      * @throws ObjectStreamException
      */
     protected Object readResolve() throws ObjectStreamException {
-        // using getName() instead of this.name works even for
-        // NOPLogger
+        // 使用getName（）代替this.name甚至适用于NOPLogger
         return LoggerFactory.getLogger(getName());
     }
 
