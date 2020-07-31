@@ -82,6 +82,7 @@ public class Log4jLoggerFactory implements ILoggerFactory {
             else
                 log4jLogger = LogManager.getLogger(name);
 
+            // 通过适配器将 org.apache.log4j.Logger 转为 org.slf4j.Logger
             Logger newInstance = new Log4jLoggerAdapter(log4jLogger);
             Logger oldInstance = loggerMap.putIfAbsent(name, newInstance);
             return oldInstance == null ? newInstance : oldInstance;

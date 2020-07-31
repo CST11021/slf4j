@@ -65,13 +65,19 @@ public final class LoggerFactory {
     static final String UNSUCCESSFUL_INIT_URL = CODES_PREFIX + "#unsuccessfulInit";
     static final String UNSUCCESSFUL_INIT_MSG = "org.slf4j.LoggerFactory in failed state. Original exception was thrown EARLIER. See also " + UNSUCCESSFUL_INIT_URL;
 
+    /** 表示加载绑定日志库的状态，这里为：未初始化 */
     static final int UNINITIALIZED = 0;
+    /** 表示加载绑定日志库的状态，这里为：正在初始化 */
     static final int ONGOING_INITIALIZATION = 1;
+    /** 表示加载绑定日志库的状态，这里为：初始化失败 */
     static final int FAILED_INITIALIZATION = 2;
+    /** 表示加载绑定日志库的状态，这里为：初始化完成 */
     static final int SUCCESSFUL_INITIALIZATION = 3;
+    /** 表示加载绑定日志库的状态，这里为：初始化为NOP */
     static final int NOP_FALLBACK_INITIALIZATION = 4;
-
+    /** 表示加载绑定日志库的状态，初始值默认为：未初始化 */
     static volatile int INITIALIZATION_STATE = UNINITIALIZED;
+
     static final SubstituteLoggerFactory SUBST_FACTORY = new SubstituteLoggerFactory();
     static final NOPLoggerFactory NOP_FALLBACK_FACTORY = new NOPLoggerFactory();
 
@@ -165,8 +171,13 @@ public final class LoggerFactory {
         INITIALIZATION_STATE = UNINITIALIZED;
     }
 
+    /**
+     * 初始化slf4j绑定的日志库
+     */
     private final static void performInitialization() {
+        // 绑定日志库
         bind();
+        // 如果初始化完成了，则做一下校验
         if (INITIALIZATION_STATE == SUCCESSFUL_INITIALIZATION) {
             versionSanityCheck();
         }
@@ -182,6 +193,9 @@ public final class LoggerFactory {
         return false;
     }
 
+    /**
+     * 绑定日志库
+     */
     private final static void bind() {
         try {
 
@@ -194,12 +208,14 @@ public final class LoggerFactory {
                 reportMultipleBindingAmbiguity(staticLoggerBinderPathSet);
             }
 
-            // 下一行进行绑定
+            // 注意：这里会使用类加载器最先加载的包的 org.slf4j.impl.StaticLoggerBinder 类
             StaticLoggerBinder.getSingleton();
 
+            // 更新状态为初始化成功
             INITIALIZATION_STATE = SUCCESSFUL_INITIALIZATION;
 
             // 如果引入了多个日志实现，则控制台输出当前使用的日志框架
+            // 每个slf4j的
             reportActualBinding(staticLoggerBinderPathSet);
 
         } catch (NoClassDefFoundError ncde) {
@@ -325,6 +341,7 @@ public final class LoggerFactory {
                     match = true;
                 }
             }
+
             if (!match) {
                 Util.report("The requested version " + requested + " by your slf4j binding is not compatible with " + Arrays.asList(API_COMPATIBILITY_LIST).toString());
                 Util.report("See " + VERSION_MISMATCH + " for further details.");
@@ -430,7 +447,7 @@ public final class LoggerFactory {
     }
 
     /**
-     *返回正在使用的{@link ILoggerFactory}实例, ILoggerFactory实例在编译时与此类绑定。
+     * 返回正在使用的{@link ILoggerFactory}实例, ILoggerFactory实例在编译时与此类绑定。
      * 
      * @return the ILoggerFactory instance in use
      */
@@ -438,6 +455,8 @@ public final class LoggerFactory {
         if (INITIALIZATION_STATE == UNINITIALIZED) {
             synchronized (LoggerFactory.class) {
                 if (INITIALIZATION_STATE == UNINITIALIZED) {
+
+                    // 设置状态为初始化中
                     INITIALIZATION_STATE = ONGOING_INITIALIZATION;
 
                     // 执行初始化：初始化一个StaticLoggerBinder，StaticLoggerBinder在具体的日志实现的包中

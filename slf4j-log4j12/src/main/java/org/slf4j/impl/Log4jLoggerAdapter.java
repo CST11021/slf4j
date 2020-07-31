@@ -40,20 +40,11 @@ import org.slf4j.helpers.MessageFormatter;
 import org.slf4j.spi.LocationAwareLogger;
 
 /**
- * A wrapper over {@link org.apache.log4j.Logger org.apache.log4j.Logger} in
- * conforming to the {@link Logger} interface.
+ * 将 {@link org.apache.log4j.Logger} 包装为符合 {@link org.slf4j.Logger}接口的实现。
  * 
- * <p>
- * Note that the logging levels mentioned in this class refer to those defined
- * in the <a
- * href="http://logging.apache.org/log4j/docs/api/org/apache/log4j/Level.html">
- * <code>org.apache.log4j.Level</code></a> class.
+ * 请注意，此类中提到的日志记录级别是指 {@link org.slf4j.Logger}中对应的日志级别，参数{@link org.apache.log4j.Level}类。
  * 
- * <p>
- * The TRACE level was introduced in log4j version 1.2.12. In order to avoid
- * crashing the host application, in the case the log4j version in use predates
- * 1.2.12, the TRACE level will be mapped as DEBUG. See also <a
- * href="http://jira.qos.ch/browse/SLF4J-59">SLF4J-59</a>.
+ * 在log4j版本1.2.12中引入了TRACE级别。为了避免使主机应用程序崩溃，在使用的log4j版本早于1.2.12的情况下，TRACE级别将映射为DEBUG。另请参见<a href="http://jira.qos.ch/browse/SLF4J-59"> SLF4J-59 </a>.
  * 
  * @author Ceki G&uuml;lc&uuml;
  */
@@ -61,21 +52,16 @@ public final class Log4jLoggerAdapter extends MarkerIgnoringBase implements Loca
 
     private static final long serialVersionUID = 6182834493563598289L;
 
+    /** 真正的日志实现委托给了：org.apache.log4j.Logger */
     final transient org.apache.log4j.Logger logger;
 
-    /**
-     * Following the pattern discussed in pages 162 through 168 of "The complete
-     * log4j manual".
-     */
+    /** 遵循“完整的log4j手册”第162页至第168页中讨论的模式。*/
     final static String FQCN = Log4jLoggerAdapter.class.getName();
 
-    // Does the log4j version in use recognize the TRACE level?
-    // The trace level was introduced in log4j 1.2.12.
+    /** 使用中的log4j版本可以识别trace级别吗，trace别在log4j 1.2.12中引入 */
     final boolean traceCapable;
 
-    // WARN: Log4jLoggerAdapter constructor should have only package access so
-    // that
-    // only Log4jLoggerFactory be able to create one.
+    /** 警告：Log4jLoggerAdapter构造函数应只具有包访问权限，以便只有Log4jLoggerFactory可以创建包 */
     Log4jLoggerAdapter(org.apache.log4j.Logger logger) {
         this.logger = logger;
         this.name = logger.getName();
@@ -90,6 +76,10 @@ public final class Log4jLoggerAdapter extends MarkerIgnoringBase implements Loca
             return false;
         }
     }
+
+
+    // trace
+
 
     /**
      * Is this logger instance enabled for the TRACE level?
@@ -190,6 +180,8 @@ public final class Log4jLoggerAdapter extends MarkerIgnoringBase implements Loca
     public void trace(String msg, Throwable t) {
         logger.log(FQCN, traceCapable ? Level.TRACE : Level.DEBUG, msg, t);
     }
+
+
 
     /**
      * Is this logger instance enabled for the DEBUG level?

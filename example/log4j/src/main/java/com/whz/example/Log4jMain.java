@@ -1,22 +1,20 @@
 package com.whz.example;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 /**
+ * 原始的第三方log4j打印日志的demo
+ *
  * @Author: wanghz
- * @Date: 2020/7/28 7:54 PM
+ * @Date: 2020/7/31 4:17 PM
  */
 public class Log4jMain {
 
-    private static final Logger logger = LoggerFactory.getLogger(Log4jMain.class);
-
     public static void main(String[] args) {
-        logger.trace("测试trace");
-        logger.debug("测试debug");
-        logger.info("测试info");
-        logger.warn("测试warn");
-        logger.error("测试error");
+        Logger logger = Logger.getLogger(Log4jMain.class);
+        logger.debug("log4j debug");
+        logger.info("log4j info");
+        logger.error("log4j error");
     }
 
 }
